@@ -3,6 +3,7 @@
 <head>
   <title>Frogger - Apenas Rua</title>
   <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     html, body {
       height: 100%;
@@ -10,15 +11,52 @@
     }
 
     body {
-      background: black;
+      background: rgb(0, 0, 0);
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
+    }
+
+    canvas {
+      border: 2px solid rgb(255, 255, 255);
+    }
+
+    #congratulationsMessage {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 20px;
+      color: greenyellow;
+      display: none;
+      background-color: rgba(0, 0, 0, 0.342);
+      padding: 5px;
+      border-radius: 10px;
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    #gameOverMessage {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 20px;
+      color: rgb(255, 3, 3);
+      display: none;
+      background-color: rgba(0, 0, 0, 0.342);
+      padding: 5px;
+      border-radius: 10px;
+      font-family: 'Press Start 2P', cursive;
     }
   </style>
 </head>
 <body>
 <canvas width="624" height="720" id="game"></canvas>
+
+<div id="congratulationsMessage">Parabéns! Você venceu!</div>
+<div id="gameOverMessage">Você foi brutalmente atropelado!</div>
+
 <script>
 const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
@@ -27,10 +65,10 @@ const grid = 48;
 const frogger = { x: grid * 6, y: grid * 13, size: grid, color: 'greenyellow' };
 const vehicles = [];
 
-// Criando várias faixas de trânsito
-const lanes = 10; // Aumentado para substituir o rio
+
+const lanes = 12; 
 for (let i = 1; i < lanes; i++) {
-  let speed = (i % 2 === 0) ? 1.5 : -1;
+  let speed = (i % 2 === 0) ? 4 : -4;
   vehicles.push({ x: grid * (i % 5), y: grid * i, size: grid * 2, speed, color: '#c2c4da' });
 }
 
@@ -58,15 +96,33 @@ function checkCollision() {
   ));
 }
 
+function checkWin() {
+  if (frogger.y <= 0) {
+    document.getElementById('congratulationsMessage').style.display = 'block';
+    setTimeout(() => {
+      frogger.x = grid * 6;
+      frogger.y = grid * 13;
+      document.getElementById('congratulationsMessage').style.display = 'none';
+    }, 2000); 
+  }
+}
+
 function loop() {
   requestAnimationFrame(loop);
   context.clearRect(0, 0, canvas.width, canvas.height);
   drawVehicles();
   drawFrogger();
+
   if (checkCollision()) {
     frogger.x = grid * 6;
     frogger.y = grid * 13;
+    document.getElementById('gameOverMessage').style.display = 'block';
+    setTimeout(() => {
+      document.getElementById('gameOverMessage').style.display = 'none'; 
+    }, 2000); 
   }
+
+  checkWin();
 }
 
 document.addEventListener('keydown', function(e) {
